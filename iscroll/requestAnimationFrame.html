@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <script src="https://cdn.bootcss.com/zepto/1.0rc1/zepto.min.js"></script>
+    <title>RequestAnimationFrame || js时钟实现动画</title>
+    <style>
+    #el{
+        background: #333;
+        width:20px;
+        height: 20px;
+        left: 0;
+        position: absolute;
+    }
+    </style>
+</head>
+<body>
+<div id="el"></div>
+<script>
+    // 普通用setTimeout实现动画
+        var pos = 0;
+        var final = 200;
+        var dir = 0;
+        var el = $('#el')
+        function upLeft(){
+            var left =parseInt(el.css('left')) || 0;
+            if(left > final) dir = 1;
+            if(left < pos) dir = 0;
+
+            if(dir == 0){
+                left ++;
+                el.css("left",left+"px");
+                setTimeout(upLeft,16);
+            } else{
+                left --;
+                el.css('left',left + "px");
+                setTimeout(upLeft,16);
+            }
+        }
+        upLeft();
+</script>
+
+<script>
+    // 使用rAF实现，用法和setTimeout差不多，传入一个callback函数
+    var rAF = window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function (callback) {
+            // 浏览器频率 (1000毫秒/60帧)=16.6ms
+            window.setTimeout(callback, 1000 / 60);
+        };
+
+        var pos = 0;
+        var final = 200;
+        var dir = 0;
+        var el = $('#el')
+        function upLeft(){
+            var left =parseInt(el.css('left')) || 0;
+            if(left > final) dir = 1;
+            if(left < pos) dir = 0;
+
+            if(dir == 0){
+                left ++;
+                el.css("left",left+"px");
+                rAF(upLeft);
+            } else{
+                left --;
+                el.css('left',left + "px");
+                rAF(upLeft);
+            }
+        }
+        upLeft();
+</script>
+</body>
+</html>

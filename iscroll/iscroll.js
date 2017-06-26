@@ -2,12 +2,14 @@
 (function (window, document, Math) {
 
     // 浏览器animation的polyfill ,如果不支持，则回退用setTimeout实现
+    // CSS的transition与animations的优势在于浏览器知道哪些动画将会发生，所以动画会得到正确的间隔来刷新UI
     var rAF = window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
         window.msRequestAnimationFrame ||
         function (callback) {
+            // 浏览器频率 (1000毫秒/60帧)=16.6ms
             window.setTimeout(callback, 1000 / 60);
         };
 
@@ -25,7 +27,7 @@
                 transform = vendors[i] + 'ransform';
                 if (transform in _elementStyle) return vendors[i].substr(0, vendors[i].length - 1);
             }
-
+        
             return false;
         })();
 
@@ -326,6 +328,8 @@
     })();
 
     function IScroll(el, options) {
+        console.log('iscroll')
+        console.log(utils)
         this.wrapper = typeof el == 'string' ? document.querySelector(el) : el;
         this.scroller = this.wrapper.children[0];
         this.scrollerStyle = this.scroller.style;		// cache style for better performance
