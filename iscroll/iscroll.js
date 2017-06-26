@@ -106,9 +106,9 @@
 
         me.extend(me, {
             hasTransform: _transform !== false,
-            hasPerspective: _prefixStyle('perspective') in _elementStyle,
+            hasPerspective: _prefixStyle('perspective') in _elementStyle, // IE10 后支持。支持让子元素有特别的transform属性
             hasTouch: 'ontouchstart' in window,
-            hasPointer: !!(window.PointerEvent || window.MSPointerEvent), // IE10 is prefixed
+            hasPointer: !!(window.PointerEvent || window.MSPointerEvent), // 指针事件。 IE10 is prefixed ---MSPointerEvent
             hasTransition: _prefixStyle('transition') in _elementStyle
         });
 
@@ -150,6 +150,10 @@
             touchAction: _prefixStyle('touchAction')
         });
 
+        /**
+         * e element
+         * c className
+         */
         me.hasClass = function (e, c) {
             var re = new RegExp("(^|\\s)" + c + "(\\s|$)");
             return re.test(e.className);
@@ -174,12 +178,13 @@
             e.className = e.className.replace(re, ' ');
         };
 
+        // 获取元素位置。getBundingClientRect适合比较新的浏览器。
         me.offset = function (el) {
             var left = -el.offsetLeft,
                 top = -el.offsetTop;
 
             // jshint -W084
-            while (el = el.offsetParent) {
+            while (el = el.offsetParent) { // 获取定位父级元素，如果存在。eg: 1.el为fixed定位，offestParent为null。  2.el定位为其他大多数情况下，offsetParent为body。 （http://www.cnblogs.com/xiaohuochai/p/5828369.html）
                 left -= el.offsetLeft;
                 top -= el.offsetTop;
             }
@@ -190,7 +195,11 @@
                 top: top
             };
         };
-
+        /**
+         * 判断是否存在异常
+         * el 元素
+         * exceptions 异常的正则表达式的集合
+         */
         me.preventDefaultException = function (el, exceptions) {
             for (var i in exceptions) {
                 if (exceptions[i].test(el[i])) {
@@ -219,6 +228,7 @@
             MSPointerUp: 3
         });
 
+        // 动画
         me.extend(me.ease = {}, {
             quadratic: {
                 style: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
@@ -271,6 +281,7 @@
             }
         });
 
+        // 封装了tap事件
         me.tap = function (e, eventName) {
             var ev = document.createEvent('Event');
             ev.initEvent(eventName, true, true);
@@ -279,15 +290,17 @@
             e.target.dispatchEvent(ev);
         };
 
+        // 封装click事件
         me.click = function (e) {
             var target = e.target,
                 ev;
 
+            // 这3个输入事件不触发iscroll点击事件
             if (!(/(SELECT|INPUT|TEXTAREA)/i).test(target.tagName)) {
                 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/initMouseEvent
                 // initMouseEvent is deprecated.
-                ev = document.createEvent(window.MouseEvent ? 'MouseEvents' : 'Event');
-                ev.initEvent('click', true, true);
+                ev = document.createEvent(window.MouseEvent ? 'MouseEvents' : 'Event');// ie 兼容
+                ev.initEvent('click', true, true); // event.initEvent(eventType,canBubble,cancelable)
                 ev.view = e.view || window;
                 ev.detail = 1;
                 ev.screenX = target.screenX || 0;
