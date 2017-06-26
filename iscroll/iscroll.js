@@ -16,6 +16,7 @@
     var utils = (function () {
         var me = {};
 
+        // Vendor Prefix 处理旧版本css3兼容前缀。新版本已经不需要了，_vendor的结果都是空
         var _elementStyle = document.createElement('div').style;
         var _vendor = (function () {
             var vendors = ['t', 'webkitT', 'MozT', 'msT', 'OT'],
@@ -31,12 +32,14 @@
             return false;
         })();
 
+        // 通用style转换成带前缀的
         function _prefixStyle(style) {
             if (_vendor === false) return false;
             if (_vendor === '') return style;
             return _vendor + style.charAt(0).toUpperCase() + style.substr(1);
         }
 
+        // 获得时间戳
         me.getTime = Date.now || function getTime() {
                 return new Date().getTime();
             };
@@ -61,18 +64,29 @@
                 pointerEvent;
         };
 
+        // 计算动画参数，
+        /**
+         * current 当前手指位置
+         * start 起点
+         * time 滑动时间？
+         * lowerMargin ？？
+         * wrapperSize wrapper尺寸高度
+         * deceleration 减速度
+         */
         me.momentum = function (current, start, time, lowerMargin, wrapperSize, deceleration) {
             var distance = current - start,
                 speed = Math.abs(distance) / time,
-                destination,
+                destination, 
                 duration;
 
+            
             deceleration = deceleration === undefined ? 0.0006 : deceleration;
-
+            // 计算最终位置的公式，看不懂。。。可能是作者自己定的一个公式
             destination = current + ( speed * speed ) / ( 2 * deceleration ) * ( distance < 0 ? -1 : 1 );
-            duration = speed / deceleration;
+            duration = speed / deceleration; // 速度/减速度 = 持续时间。速度最终为0
 
-            if (destination < lowerMargin) {
+            // 某种边界判断？
+            if (destination < lowerMargin) { // 所以这个lowerMargin 一定是负的？
                 destination = wrapperSize ? lowerMargin - ( wrapperSize / 2.5 * ( speed / 8 ) ) : lowerMargin;
                 distance = Math.abs(destination - current);
                 duration = distance / speed;
