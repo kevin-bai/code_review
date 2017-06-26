@@ -13,6 +13,7 @@
             window.setTimeout(callback, 1000 / 60);
         };
 
+    // 工具函数
     var utils = (function () {
         var me = {};
 
@@ -332,8 +333,9 @@
             return touchAction;
         };
 
+        // 这个和上面的getOffset有什么区别？这个函数取了4个值？
         me.getRect = function (el) {
-            if (el instanceof SVGElement) {
+            if (el instanceof SVGElement) {// 判断是否支持getBoundingClientRect
                 var rect = el.getBoundingClientRect();
                 return {
                     top: rect.top,
@@ -354,13 +356,14 @@
         return me;
     })();
 
+    // 构造函数
     function IScroll(el, options) {
-        console.log('iscroll')
-        console.log(utils)
+        console.log('iscroll');
         this.wrapper = typeof el == 'string' ? document.querySelector(el) : el;
         this.scroller = this.wrapper.children[0];
         this.scrollerStyle = this.scroller.style;		// cache style for better performance
 
+        // 默认options
         this.options = {
 
             resizeScrollbars: true,
@@ -391,11 +394,12 @@
             useTransform: true,
             bindToWrapper: typeof window.onmousedown === "undefined"
         };
-
+        // options循环赋值
         for (var i in options) {
             this.options[i] = options[i];
         }
 
+        // options之间的互相限定
         // Normalize options
         this.translateZ = this.options.HWCompositing && utils.hasPerspective ? ' translateZ(0)' : '';
 
@@ -452,6 +456,7 @@
         this.enable();
     }
 
+    // 原型函数
     IScroll.prototype = {
         version: '5.2.0-snapshot',
 
@@ -1026,7 +1031,7 @@
         // INSERT POINT: _translate
 
         },
-
+        // 通过一个remove参数，把事件的注册和卸载，用一个方法实现。。666
         _initEvents: function (remove) {
             var eventType = remove ? utils.removeEvent : utils.addEvent,
                 target = this.options.bindToWrapper ? this.wrapper : window;
@@ -1960,7 +1965,7 @@
 
             this._pos(newX, newY);
 
-// INSERT POINT: indicator._move
+        // INSERT POINT: indicator._move
 
             e.preventDefault();
             e.stopPropagation();
@@ -2208,11 +2213,13 @@
         }
     };
 
+    // utils作为IScroll的静态属性
     IScroll.utils = utils;
 
-    if (typeof module != 'undefined' && module.exports) {
+    // 探测commonJS和amd规范
+    if (typeof module != 'undefined' && module.exports) {// 探测commonJS规范
         module.exports = IScroll;
-    } else if (typeof define == 'function' && define.amd) {
+    } else if (typeof define == 'function' && define.amd) { // 探测amd规范
         define(function () {
             return IScroll;
         });
