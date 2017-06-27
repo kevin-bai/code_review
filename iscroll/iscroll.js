@@ -445,7 +445,7 @@
         this.y = 0;
         this.directionX = 0;
         this.directionY = 0;
-        this._events = {};
+        this._events = {}; // 事件数组的集合，以_events[type]来为一个数组，里面放对应的fn方法
 
         // INSERT POINT: DEFAULTS
 
@@ -479,13 +479,13 @@
                 this._initKeys();
             }
 
-        // INSERT POINT: _init
+            // INSERT POINT: _init
 
         },
 
         destroy: function () {
-            this._initEvents(true);
-            clearTimeout(this.resizeTimeout);
+            this._initEvents(true);// 卸载事件
+            clearTimeout(this.resizeTimeout); // resizeTimeout -- 窗口resize事件
             this.resizeTimeout = null;
             this._execEvent('destroy');
         },
@@ -758,6 +758,7 @@
             this._execEvent('scrollEnd');
         },
 
+        // 捕获窗口resize后触发的事件
         _resize: function () {
             var that = this;
 
@@ -877,6 +878,7 @@
             }
         },
 
+        // 循环处理事件队列
         _execEvent: function (type) {
             if (!this._events[type]) {
                 return;
